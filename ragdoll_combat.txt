@@ -1,0 +1,11 @@
+"ragdoll_combat"
+{
+	"base"		"base"
+	"title"		"Ragdoll Combat"
+	"maps"		"^nope_"
+	"menusystem"	"1"
+	"settings"
+	{
+
+	}
+}
