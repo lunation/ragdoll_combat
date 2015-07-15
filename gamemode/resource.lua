@@ -22,14 +22,14 @@ if SERVER then
 	resource.AddSingleFile("sound/ragcom/shia_win.wav")
 	resource.AddSingleFile("sound/ragcom/postal_win.wav")
 	resource.AddSingleFile("sound/ragcom/postal_fall.wav")
-else
-	RAGCOM_MATS = {}
+end
 
-	for k,v in pairs(textures) do
-		local m = Material(v..".png")
-		CreateMaterial("ragcom_"..k,"VertexLitGeneric",{["$basetexture"] = v})
-		RAGCOM_MATS[v] = "!ragcom_"..k
-	end
+RAGCOM_MATS = {}
+
+for k,v in pairs(textures) do
+	local m = Material(v..".png")
+	if CLIENT then CreateMaterial("ragcom_"..k,"VertexLitGeneric",{["$basetexture"] = v}) end
+	RAGCOM_MATS[v] = "!ragcom_"..k
 end
 
 RAGCOM_CHARS = {
@@ -145,11 +145,16 @@ RAGCOM_CHARS = {
 		setup=function(ragdoll)
 			ragdoll:SetMaterial("models/debug/debugwhite")
 			ragdoll:SetColor(Color(100,255,50))
-			local m = ClientsideModel("models/props_junk/watermelon01.mdl")
-			m:SetParent(ragdoll)
-			m:SetParentPhysNum(10)
-			m:SetLocalPos(Vector(0,0,0))
-			ragdoll:CallOnRemove("mel", function() if IsValid(m) then m:Remove() end end)
+			
+			if SERVER then
+				local m = ents.Create("prop_dynamic")
+				m:SetModel("models/props_junk/watermelon01.mdl")
+				m:Spawn()
+				m:SetParent(ragdoll)
+				m:SetParentPhysNum(10)
+				m:SetLocalPos(Vector(0,0,0))
+				ragdoll:DeleteOnRemove(m)
+			end
 
 		end,
 		neg="garrysmod/balloon_pop_cute.wav",

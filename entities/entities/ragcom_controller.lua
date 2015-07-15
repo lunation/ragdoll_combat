@@ -40,6 +40,8 @@ function ENT:Initialize()
 
 		self:DeleteOnRemove(ragdoll)
 
+		RAGCOM_CHARS[self:GetChar()].setup(ragdoll)
+
 		/*for i=1,100 do
 			print(i,ragdoll:GetBoneName(i),ragdoll:TranslateBoneToPhysBone(i))
 		end*/
@@ -115,13 +117,18 @@ function ENT:Initialize()
 		self:StepStart(SIDE_LEFT,self:GetStepPos(SIDE_LEFT,control),.1,5)
 		self:StepStart(SIDE_RIGHT,self:GetStepPos(SIDE_RIGHT,control),.1,5)
 	else
-		local ragdoll = self:GetRagdoll()
-		
-		RAGCOM_CHARS[self:GetChar()].setup(ragdoll)
+		//I would fix this gud but I am running out of time FAST
+		//timer.Simple(.1,function()
+			//if not IsValid(self) then return end
+			//local ragdoll = self:GetRagdoll()
+			
+			
+			//print(">>",self:GetChar())
 
-		if self:GetController()==LocalPlayer() then
-			LocalPlayerController = self
-		end
+			if self:GetController()==LocalPlayer() then
+				LocalPlayerController = self
+			end
+		//end)
 	end
 end
 
@@ -206,7 +213,7 @@ function ENT:PhysicsSimulate(phys_body,dt)
 
 	local phys_head = ragdoll:GetPhysicsObjectNum(10)
 
-	if self:GetController():KeyPressed(IN_JUMP) then
+	if self:GetController():KeyDown(IN_JUMP) then
 		self:EmitSound("player/pl_pain5.wav")
 		self.limp_timer = 2
 		local vel = Vector(0,0,900)+self.lean*self:GetEnergy()*10
@@ -245,11 +252,11 @@ function ENT:PhysicsSimulate(phys_body,dt)
 			doControl(phys_fistl,phys_body:GetPos()+Vector(0,0,30)+self.yaw:Forward()*10+self.yaw:Right()*-3)
 			doControl(phys_fistr,phys_body:GetPos()+Vector(0,0,30)+self.yaw:Forward()*10+self.yaw:Right()*3)
 		else
-			if self:GetController():KeyPressed(IN_ATTACK) then
+			if self:GetController():KeyDown(IN_ATTACK) then
 				self.punch_l=.4
 				self:EmitSound("npc/vort/claw_swing1.wav")
 			end
-			if self:GetController():KeyPressed(IN_ATTACK2) then
+			if self:GetController():KeyDown(IN_ATTACK2) then
 				self.punch_r=.4
 				self:EmitSound("npc/vort/claw_swing2.wav")
 			end

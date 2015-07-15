@@ -191,7 +191,7 @@ function GM:HUDPaint()
 	end
 
 	if not IsValid(LocalPlayerController) then
-		draw.SimpleText("You are spectating. Press F1 for help. Press F2 to select a character.","Trebuchet24",ScrW()/2,ScrH()-100,Color(255,255,255),TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+		draw.SimpleText("You are spectating. Press F1 for help. Press F2 to select a character.","Trebuchet18",ScrW()/2,ScrH()-100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 	end
 end
 
@@ -210,8 +210,8 @@ function GM:HUDDrawScoreBoard()
 		surface.SetDrawColor(grey)
 		surface.DrawRect(ScrW()/4,85,ScrW()/2,80)
 
-		draw.SimpleText(GetHostName(),"Trebuchet24",ScrW()/2,100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-		draw.SimpleText("Ragdoll Combat II: Flatgrass Smash","Trebuchet24",ScrW()/2,125,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+		draw.SimpleText(GetHostName(),"Trebuchet18",ScrW()/2,100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+		draw.SimpleText("Ragdoll Combat II: Flatgrass Smash","Trebuchet18",ScrW()/2,125,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 		draw.SimpleText("Playing to "..RAGCOM_WINS.." wins.","Trebuchet18",ScrW()/2,150,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 
 		local t = {}
@@ -223,8 +223,8 @@ function GM:HUDDrawScoreBoard()
 		for k,ply in pairs(player.GetAll()) do
 			surface.SetDrawColor(t[ply] and getWeaknessColor(t[ply]) or grey)
 			surface.DrawRect(ScrW()/4,135+k*35,ScrW()/2,30)
-			draw.SimpleText(ply:GetName(),"Trebuchet24",ScrW()/4+10,150+k*35,black,TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Win" or " Wins"),"Trebuchet24",ScrW()/2,150+k*35,black,TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:GetName(),"Trebuchet18",ScrW()/4+10,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Win" or " Wins"),"Trebuchet18",ScrW()/2,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
 		end
 	end
 	//print(GetHostName())
