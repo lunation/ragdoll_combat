@@ -3,4 +3,6 @@ GM.Author = ""
 GM.Email = ""
 GM.Website = ""
 
-// Ragdoll Combat: Flatgrass Smash
+include("resource.lua")
+
+RAGCOM_WINS = 5

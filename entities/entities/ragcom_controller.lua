@@ -14,18 +14,7 @@ function ENT:SetupDataTables()
 
 	self:NetworkVar("Int",0,"Energy")
 	self:NetworkVar("Int",1,"Weakness")
-end
-
-if CLIENT then
-	local m1 = Material("spudz_face.png")
-	CreateMaterial("_spudz_face","VertexLitGeneric",{
-		["$basetexture"] = "spudz_face"
-	})
-	
-	local m2 = Material("spudz_body.png")
-	CreateMaterial("_spudz_body","VertexLitGeneric",{
-		["$basetexture"] = "spudz_body"
-	})
+	self:NetworkVar("Int",2,"Char")
 end
 
 local SIDE_LEFT = true
@@ -40,7 +29,7 @@ function ENT:Initialize()
 		self:SetModel("models/props_junk/PlasticCrate01a.mdl")
 
 		local ragdoll = ents.Create("prop_ragdoll")
-		ragdoll:SetModel("models/Barney.mdl")
+		ragdoll:SetModel(RAGCOM_CHARS[self:GetChar()].model)
 		ragdoll:SetPos(self:GetPos())
 		ragdoll:Spawn()
 		self:SetRagdoll(ragdoll)
@@ -128,9 +117,7 @@ function ENT:Initialize()
 	else
 		local ragdoll = self:GetRagdoll()
 		
-		//PrintTable(ragdoll:GetMaterials())
-		ragdoll:SetSubMaterial(2,"!_spudz_face")
-		ragdoll:SetSubMaterial(4,"!_spudz_body")
+		RAGCOM_CHARS[self:GetChar()].setup(ragdoll)
 
 		if self:GetController()==LocalPlayer() then
 			LocalPlayerController = self
@@ -353,7 +340,7 @@ function ENT:StepPoll()
 		self.do_limp = false
 		self.limp_timer = 3
 
-		self:EmitSound("vo/npc/Barney/ba_ohshit03.wav")
+		self:EmitSound(RAGCOM_CHARS[self:GetChar()].neg)
 		self:TryTakeEnergy(energy_fall)
 		return
 	end
@@ -460,7 +447,7 @@ function ENT:ForceTakeEnergy(n)
 	if n>=current then
 		self:SetEnergy(self.MaxEnergy)
 		self:SetWeakness(self:GetWeakness()+1)
-		self:EmitSound("vo/npc/Barney/ba_ohshit03.wav")
+		self:EmitSound(RAGCOM_CHARS[self:GetChar()].neg)
 		self.limp_timer = 2
 		self.limp_invuln = true
 		return true
@@ -517,7 +504,7 @@ function ENT:RagdollCollide(ragdoll,data)
 end
 
 function ENT:WinTaunt()
-	self:EmitSound("vo/npc/Barney/ba_laugh01.wav")
+	self:EmitSound(RAGCOM_CHARS[self:GetChar()].pos)
 	self.won=true
 end
 
