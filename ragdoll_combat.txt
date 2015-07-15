@@ -2,7 +2,7 @@
 {
 	"base"		"base"
 	"title"		"Ragdoll Combat"
-	"maps"		"^nope_"
+	"maps"		"^ragcom_"
 	"menusystem"	"1"
 	"settings"
 	{

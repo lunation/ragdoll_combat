@@ -1,6 +1,6 @@
-GM.Name = ""
+GM.Name = "Ragdoll Combat"
 GM.Author = ""
 GM.Email = ""
 GM.Website = ""
 
-DeriveGamemode( "sandbox" )
+// Ragdoll Combat: Flatgrass Smash
