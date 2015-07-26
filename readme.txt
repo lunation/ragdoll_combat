@@ -1,3 +1,4 @@
 An entry to the 1 Week Gamemode Contest.
 
-Just the template files ATM, nothing to see here.
+See the FP thread for actual information:
+http://facepunch.com/showthread.php?t=1476465
