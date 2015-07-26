@@ -19,15 +19,17 @@ window_help:Hide()
 local wh_html = window_help:Add("DHTML")
 wh_html:SetPos(10,35)
 wh_html:SetSize(window_help:GetWide()-20,window_help:GetTall()-100)
+wh_html:SetAllowLua(true)
 wh_html:SetHTML[[
 <style>
 	body {
-		background-color: #dfd;
+		font-family: arial;
+		background-color: #ddf;
 	}
 </style>
 <h1>Welcome to Ragdoll Combat II!</h1>
 <h2>Info</h2>
-Ragdoll Combat II is a new <s>game of skill</s> <s>esport</s> <s>smash bros clone</s> <s>laggy mess</s> gamemode by Parakeet. 
+<p>Ragdoll Combat II is a new <s>game of skill</s> <s>esport</s> <s>smash bros clone</s> <s>laggy mess</s> gamemode by Parakeet.</p> 
 <p>
 The goal is to knock all the other ragdolls off the spawn platform.
 </p>
@@ -37,7 +39,7 @@ When a ragdoll's power level reaches 0, it will be knocked over.
 Every time a ragdoll is knocked over it will be flung farther.
 The more red the power bar is, the farther the ragdoll will be flung.
 <p>
-To start playing, pick a character in the F2 menu.
+To start playing, pick a character in the F2 menu. (Use the chat command /char if F2 doesn't work!)
 </p>
 <h2>Controls</h2>
 <ul>
@@ -48,16 +50,33 @@ To start playing, pick a character in the F2 menu.
 <li> Jump - Tackle/Dive (Based on power level, movement keys control direction)
 </ul>
 <h2>About</h2>
-This gamemode was created for the 1 week Garry's Mod gamemode competition in July 2015.
+<p>
+This gamemode was created for the <a steamui href="http://facepunch.com/showthread.php?t=1474356">1 Week Garry's Mod Gamemode Competition</a> in July 2015.
+There are official discussions on <a steamui href="http://steamcommunity.com/groups/_lunation/discussions/0/535151589891117198/">Steam</a> and <a steamui href="http://facepunch.com/showthread.php?t=1476465">Facepunch</a>.
+</p>
+<p>
+It was created by <a steamui href="http://steamcommunity.com/groups/_lunation">Lunation</a>, which is currently a one-man-show consisting of Parakeet (that one guy who made that one mod with the pills).
+Lunation also hosts the official Ragdoll Combat server.
+</p>
+<p>
+It can be downloaded for free at <a steamui href="TODO, SOMEONE REMIND ME TO ADD THE LINK">garrysmods.org</a>.
+It will be available on the Workshop eventually.
+</p>
+<p>
+It is open source! Contributions can be made via the <a steamui href="https://github.com/lunation/ragdoll_combat">Github Repository</a>.
+</p>
 <h2>Credits</h2>
 <ul>
 <li>Parakeet - Code, Textures
 <li>Dick Valentine - Inspirational Quotes/Song Lyrics
 <li>Sounds are from: "Shia LaBeouf" by Rob Cantor, Turrets Guy, and L4D2
 <li>Special thanks to: Postal, Shia LaBeouf, Ellen Pao, whoever is repsonsible for "That Cat", Pugs, John Lua
-<li>Extra special thanks to: Exploderguy, TheMrFailz, James xX, NiandraLades, Fortune11709, Shotz, YourStalker, sarge997, Pdan4, Skylight
+<li>Extra special thanks to: Exploderguy, The Commander, James xX, sarge, TheMrFailz, NiandraLades, Fortune11709, Shotz, YourStalker, sarge997, Pdan4, Skylight
 </ul>
 Sorry if I forgot anything please don't ban me from the internet.
+<script>
+Array.prototype.forEach.call(document.querySelectorAll("a[steamui]"),function(e) {e.onclick = function() {console.log("RUNLUA:gui.OpenURL('"+e.href+"')");return false;}});
+</script>
 ]]
 
 local wh_btn = window_help:Add("DButton")
@@ -81,7 +100,7 @@ wc_info:SetPos(20,35)
 wc_info:SetSize(window_char:GetWide()/2-50,window_char:GetTall()/2-60)
 
 local function setInfo(body)
-	wc_info:SetHTML("<style>body {background-color: #dfd;}</style>"..body)
+	wc_info:SetHTML("<style>body {font-family: arial; background-color: #ddf;}</style>"..body)
 end
 
 local wc_model = window_char:Add("DModelPanel")
@@ -142,6 +161,22 @@ net.Receive("ragcom_gui",function()
 	end
 end)
 
+hook.Add("OnPlayerChat","ragcom",function(ply,txt)
+	if txt=="/help" or txt=="!help" then
+		if ply==LocalPlayer() then
+			window_help:Show()
+			window_help:MakePopup()
+		end
+		return true
+	elseif txt=="/char" or txt=="!char" then
+		if ply==LocalPlayer() then
+			window_char:Show()
+			window_char:MakePopup()
+		end
+		return true
+	end
+end)
+
 function GM:CalcView(ply,pos,ang,fov,near,far)
 	if IsValid(LocalPlayerController) then
 		local ragdoll = LocalPlayerController:GetRagdoll()
@@ -160,6 +195,20 @@ end
 
 local black = Color(0,0,0)
 local grey = Color(200,200,200)
+
+
+local icon_admin = Material("icon16/shield.png")
+local icon_typing = Material("icon16/keyboard.png")
+local icon_voice = Material("icon16/sound.png")
+
+local voice_tracker = {}
+hook.Add("PlayerStartVoice","ragcom",function(ply)
+	voice_tracker[ply]=true
+end)
+
+hook.Add("PlayerEndVoice","ragcom",function(ply)
+	voice_tracker[ply]=nil
+end)
 
 local function getWeaknessColor(ent)
 	local e = math.min(ent:GetWeakness()/5,1)
@@ -184,13 +233,40 @@ function GM:HUDPaint()
 			local ply = ent:GetController()
 
 			if IsValid(ply) then
+				surface.SetDrawColor(255,255,255,255)
+				
+				local ply_icon
+				
+				if LUNAR then
+					ply_icon = LUNAR.getPlayerIcon(ply)
+				end
+
+				if !ply_icon and ply:IsAdmin() then
+					ply_icon= icon_admin
+				end
+
+				if ply_icon then
+					surface.SetMaterial(ply_icon)
+					surface.DrawTexturedRect(scrpos.x-60,scrpos.y,16,16)
+				end	
+					
+				if voice_tracker[ply] then
+					surface.SetMaterial(icon_voice)
+					surface.DrawTexturedRect(scrpos.x+46,scrpos.y,16,16)
+				elseif ply:IsTyping() then
+					surface.SetMaterial(icon_typing)
+					surface.DrawTexturedRect(scrpos.x+46,scrpos.y,16,16)
+				end
+
 				draw.SimpleText(ply:GetName(),"Trebuchet18",scrpos.x,scrpos.y+6,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+
 			end
 		end
 	end
 
 	if not IsValid(LocalPlayerController) then
 		draw.SimpleText("You are spectating. Press F1 for help. Press F2 to select a character.","Trebuchet18",ScrW()/2,ScrH()-100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
+		draw.SimpleText("OR use the /help and /char chat commands.","Trebuchet18",ScrW()/2,ScrH()-80,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 	end
 end
 
@@ -204,10 +280,14 @@ function GM:ScoreboardHide()
 	scoreboard = false
 end
 
+
 function GM:HUDDrawScoreBoard()
 	if scoreboard then
+		surface.SetDrawColor(black)
+		surface.DrawRect(ScrW()/4-5,80,ScrW()/2+10,70+#player.GetAll()*35)
+
 		surface.SetDrawColor(grey)
-		surface.DrawRect(ScrW()/4,85,ScrW()/2,80)
+		surface.DrawRect(ScrW()/4,85,ScrW()/2,60)
 
 		draw.SimpleText(GetHostName(),"Trebuchet18",ScrW()/2,100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 		draw.SimpleText("Ragdoll Combat II: Flatgrass Smash","Trebuchet18",ScrW()/2,125,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
@@ -220,19 +300,45 @@ function GM:HUDDrawScoreBoard()
 
 		for k,ply in pairs(player.GetAll()) do
 			surface.SetDrawColor(t[ply] and getWeaknessColor(t[ply]) or grey)
-			surface.DrawRect(ScrW()/4,135+k*35,ScrW()/2,30)
-			draw.SimpleText(ply:GetName(),"Trebuchet18",ScrW()/4+10,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Point" or " Points"),"Trebuchet18",ScrW()/2,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			surface.DrawRect(ScrW()/4,115+k*35,ScrW()/2,30)
+			draw.SimpleText(ply:GetName(),"Trebuchet18",ScrW()/4+50,130+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Point" or " Points"),"Trebuchet18",ScrW()/2,130+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:Ping().."ms","Trebuchet18",ScrW()/1.5,130+k*35,black,TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			
+			surface.SetDrawColor(255,255,255,255)
+			
+			local ply_icon
+			
+			if LUNAR then
+				ply_icon = LUNAR.getPlayerIcon(ply)
+			end
+
+			if !ply_icon and ply:IsAdmin() then
+				ply_icon= icon_admin
+			end
+
+			if ply_icon then
+				surface.SetMaterial(ply_icon)
+				surface.DrawTexturedRect(ScrW()/4+4,122+k*35,16,16)
+			end
+
+			if voice_tracker[ply] then
+				surface.SetMaterial(icon_voice)
+				surface.DrawTexturedRect(ScrW()/4+26,122+k*35,16,16)
+			elseif ply:IsTyping() then
+				surface.SetMaterial(icon_typing)
+				surface.DrawTexturedRect(ScrW()/4+26,122+k*35,16,16)
+			end
 		end
 	end
-	//print(GetHostName())
 end
 
-local orange = Color(255,100,50)
+local red = Color(255,50,50)
+local yellow = Color(255,255,50)
 local white = Color(255,255,255)
 function GM:OnPlayerChat(ply, text, bTeamOnly, bPlayerIsDead) --No *Dead* tags, please!
 	if IsValid(ply) then
-		chat.AddText(orange,ply:GetName(),white,": ",text)
+		chat.AddText(ply:IsAdmin() and red or yellow,ply:GetName(),white,": ",text)
 		return true
 	end
 end
