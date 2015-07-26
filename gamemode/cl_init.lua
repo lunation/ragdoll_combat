@@ -30,7 +30,6 @@ wh_html:SetHTML[[
 Ragdoll Combat II is a new <s>game of skill</s> <s>esport</s> <s>smash bros clone</s> <s>laggy mess</s> gamemode by Parakeet. 
 <p>
 The goal is to knock all the other ragdolls off the spawn platform.
-The gamemode will continue until someone scores the number of wins listed on the scoreboard.
 </p>
 <p>
 Every ragdoll has a bar above its head showing its name and power level.
@@ -212,7 +211,6 @@ function GM:HUDDrawScoreBoard()
 
 		draw.SimpleText(GetHostName(),"Trebuchet18",ScrW()/2,100,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 		draw.SimpleText("Ragdoll Combat II: Flatgrass Smash","Trebuchet18",ScrW()/2,125,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
-		draw.SimpleText("Playing to "..RAGCOM_WINS.." wins.","Trebuchet18",ScrW()/2,150,black,TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER)
 
 		local t = {}
 		for _,ent in pairs(ents.FindByClass("ragcom_controller")) do
@@ -224,7 +222,7 @@ function GM:HUDDrawScoreBoard()
 			surface.SetDrawColor(t[ply] and getWeaknessColor(t[ply]) or grey)
 			surface.DrawRect(ScrW()/4,135+k*35,ScrW()/2,30)
 			draw.SimpleText(ply:GetName(),"Trebuchet18",ScrW()/4+10,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
-			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Win" or " Wins"),"Trebuchet18",ScrW()/2,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:Frags()..(ply:Frags()==1 and " Point" or " Points"),"Trebuchet18",ScrW()/2,150+k*35,Color(0,0,0,255),TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER)
 		end
 	end
 	//print(GetHostName())

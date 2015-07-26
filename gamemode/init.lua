@@ -69,30 +69,7 @@ local function round_start()
 	end
 end
 
-local function triple_bonus(winner)
-	RAGCOM_ROUND_RUNNING=false
-	timer.Simple(3,function()
-		gm_msg("NOW, PREPARE YOURSELVES FOR THE TRIPLE BONUS ROUND!",Color(50,50,255))
-		gm_msg("(The 'wgcc_fin_nextgamemode' hook will be called after 60 seconds)",Color(100,100,100))
-		timer.Simple(3,function()
-			local players = get_non_spectators()
-			for k,v in pairs(players) do
-				if v==winner then continue end
-				local n = (k/#players)*6.28
-				spawn_doll(v,n,#players*50)
-				spawn_doll(v,n,#players*50)
-				spawn_doll(v,n,#players*50)
-				v:SetEyeAngles(Angle(0,-90-math.deg(n),0))
-			end
-			timer.Simple(60,function()
-				hook.Call("wgcc_fin_nextgamemode")
-				gm_msg("(The 'wgcc_fin_nextgamemode' hook has been called)",Color(100,100,100))
-			end)
-		end)
-	end)
-end
-
-local function round_end(triple_bonus)
+local function round_end()
 	RAGCOM_ROUND_RUNNING = false
 	timer.Simple(3,function()
 		local players = get_non_spectators()
@@ -145,17 +122,10 @@ function GM:Think()
 		local ply = controllers[1]:GetController()
 		controllers[1]:WinTaunt()
 		ply:AddFrags(1)
-		if ply:Frags()>=RAGCOM_WINS then
 
-			gm_msg(ply:GetName().." won the tournament!",Color(50,50,255))
-
-			triple_bonus(ply)
-		else
-			gm_msg(ply:GetName().." won the round!",Color(50,255,50))
-			round_end()
-		end
+		gm_msg(ply:GetName().." won the round!",Color(50,255,50))
+		round_end()
 	elseif #controllers==0 then
-		local ply = controllers[1]:GetController()
 		gm_msg("Evidently there's nobody left so I guess it's time to reset.",Color(50,255,50))
 		round_end()
 	end

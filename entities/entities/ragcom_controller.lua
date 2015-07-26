@@ -178,7 +178,7 @@ function ENT:PhysicsSimulate(phys_body,dt)
 	local vang = self:GetController():EyeAngles()
 	vang.p = 0
 
-	self.yaw = LerpAngle(.03,self.yaw,vang)
+	self.yaw = LerpAngle(.1,self.yaw,vang)
 
 	if self.limp_timer>0 then
 		self.limp_timer = self.limp_timer-dt
