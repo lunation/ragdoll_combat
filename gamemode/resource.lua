@@ -127,6 +127,30 @@ RAGCOM_CHARS = {
 		setup=function(ragdoll)
 			ragdoll:SetSubMaterial(2,RAGCOM_MATS["ragcom/postal_face"])
 			ragdoll:SetSubMaterial(4,RAGCOM_MATS["ragcom/postal_body"])
+			
+			if SERVER then
+				local e1 = ents.Create("prop_dynamic")
+				e1:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
+				e1:Spawn()
+				local p = ragdoll:GetBonePosition(6)
+				e1:SetPos(p+Vector(6.5,-4.5,0))
+				e1:SetAngles(Angle(0,0,90))
+				e1:SetModelScale(.08,0)
+				e1:FollowBone(ragdoll,6)
+				e1:DrawShadow(false)
+				ragdoll:DeleteOnRemove(e1)
+
+				local e2 = ents.Create("prop_dynamic")
+				e2:SetModel("models/Combine_Helicopter/helicopter_bomb01.mdl")
+				e2:Spawn()
+				local p = ragdoll:GetBonePosition(6)
+				e2:SetPos(p+Vector(6.5,-4.5,3))
+				e2:SetAngles(Angle(0,0,90))
+				e2:SetModelScale(.08,0)
+				e2:FollowBone(ragdoll,6)
+				e2:DrawShadow(false)
+				ragdoll:DeleteOnRemove(e1)
+			end
 		end,
 		neg="ragcom/postal_fall.wav",
 		pos="ragcom/postal_win.wav"
@@ -151,7 +175,7 @@ RAGCOM_CHARS = {
 				m:SetModel("models/props_junk/watermelon01.mdl")
 				m:Spawn()
 				local p = ragdoll:GetBonePosition(6)
-				m:SetPos(p+Vector(5,0,-5))-- (0,0,0))
+				m:SetPos(p+Vector(5,0,-5))
 				m:FollowBone(ragdoll,6)
 				ragdoll:DeleteOnRemove(m)
 			end
