@@ -58,7 +58,10 @@ local function get_non_spectators()
 	return t
 end
 
+local last_ko=CurTime()
+
 local function round_start()
+	last_ko = CurTime()
 	gm_msg("Round #"..RAGCOM_ROUND_N..": Fight!",Color(50,50,255))
 	RAGCOM_ROUND_N=RAGCOM_ROUND_N+1
 	RAGCOM_ROUND_RUNNING = true
@@ -75,6 +78,7 @@ local function round_end()
 	timer.Simple(3,function()
 		local players = get_non_spectators()
 		for k,v in pairs(players) do
+			v.hasbrick=nil
 			if IsValid(v.controller) then
 				v.controller:Remove()
 				//resetView(v)
@@ -95,6 +99,23 @@ function GM:PlayerInitialSpawn(ply)
 	else
 		ply.char=0
 	end
+end
+
+function GM:KeyPress(ply, key)
+	if key==IN_ATTACK and (ply:IsAdmin() or ply.hasbrick) then
+		ply.hasbrick=nil
+		local block = ents.Create("prop_physics")
+		block:SetModel("models/props_junk/cinderblock01a.mdl")
+		block:SetPos(ply:GetPos())
+		block:SetMaterial("models/debug/debugwhite")
+		block:SetColor(Color(100,100,100))
+		block:Spawn()
+		local phys = block:GetPhysicsObject()
+		if IsValid(phys) then
+			phys:SetVelocity(ply:EyeAngles():Forward()*1000)
+		end
+		timer.Simple(3,function() if IsValid(block) then block:Remove() end end)
+	end 
 end
 
 // No spawning allowed!
@@ -150,6 +171,17 @@ function GM:Think()
 				gm_msg(ply:GetName().." was KO'd!",Color(255,50,50))
 				resetView(ply)
 			end)
+		end
+	end
+
+	--brickage
+	if last_ko+60<CurTime() then
+		last_ko=CurTime()
+		gm_msg("This is getting boring! Spectators have been given bricks to throw at fighters!",Color(255,50,50))
+		for k,v in pairs(player.GetAll()) do
+			if !IsValid(v.controller) then
+				v.hasbrick=true
+			end		
 		end
 	end
 end
