@@ -59,7 +59,7 @@ It was created by <a steamui href="http://steamcommunity.com/groups/_lunation">L
 Lunation also hosts the official Ragdoll Combat server.
 </p>
 <p>
-It can be downloaded for free at <a steamui href="TODO, SOMEONE REMIND ME TO ADD THE LINK">garrysmods.org</a>.
+It can be downloaded for free at <a steamui href="https://garrysmods.org/download/48868/ragdoll-combat-ii">garrysmods.org</a>.
 It will be available on the Workshop eventually.
 </p>
 <p>
@@ -376,3 +376,36 @@ function GM:InitPostEntity()
 		m:Recompute()
 	end
 end
+
+-- Anti-AFK
+-- Yes, I know it's easy to get around, but breaking Anti-AFK is easy anyway.
+
+local lastbind = CurTime()
+local lastangles = EyeAngles() 
+
+function GM:PlayerBindPress( ply, bind, pressed )
+	lastbind = CurTime()
+	return false
+end
+
+timer.Create("ragcom_afk_check",10,0,function()
+	if lastangles!=EyeAngles() then
+		lastangles = EyeAngles()
+		return
+	end
+
+	if IsValid(LocalPlayerController) then
+		if lastbind+60<CurTime() then
+			net.Start("ragcom_select_char")
+			net.WriteUInt(selected_n,0)
+			net.SendToServer()
+			RunConsoleCommand("say","I'm being moved to Spectator because I'm AFK!")
+			RunConsoleCommand("ragcom_rocket")
+		end
+	elseif !LocalPlayer():IsAdmin() then
+		if lastbind+300<CurTime() then
+			RunConsoleCommand("say","I'm being removed from the game because I'm AFK!")
+			RunConsoleCommand("disconnect")
+		end
+	end
+end)

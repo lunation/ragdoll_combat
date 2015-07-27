@@ -14,6 +14,7 @@ net.Receive("ragcom_select_char",function(_,ply)
 end)
 
 local function gm_msg(str,col)
+	if game.IsDedicated() then print(">>",str) end
 	net.Start("ragcom_msg")
 	net.WriteString(str)
 	net.WriteColor(col)
@@ -164,3 +165,22 @@ function GM:ShowTeam(ply)
 	net.WriteInt(2,8)
 	net.Send(ply)
 end
+
+concommand.Add("ragcom_rocket",function(ply)
+	if IsValid(ply) and IsValid(ply.controller) and !ply.controller.rocketed then
+		ply.controller.rocketed=true
+		ply.controller.limp_timer=100
+		ply.controller:EmitSound("npc/env_headcrabcanister/launch.wav")
+		--shamelessly stolen from old wiki
+		util.SpriteTrail(ply.controller, 0, Color(255,0,0), false, 15, 1, 4, 1/(15+1)*0.5, "trails/plasma.vmt")
+
+		local ragdoll = ply.controller:GetRagdoll()
+		local v = Vector(0,0,10000)+VectorRand()*5000
+		for i=1, ragdoll:GetPhysicsObjectCount() do
+			ragdoll:GetPhysicsObjectNum(i-1):SetVelocity(v)	
+		end
+		
+		--failsafe
+		timer.Simple(8,function() if IsValid(ply.controller) then ply.controller:Remove() end end)
+	end
+end)
