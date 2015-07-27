@@ -102,7 +102,7 @@ function GM:PlayerInitialSpawn(ply)
 end
 
 function GM:KeyPress(ply, key)
-	if key==IN_ATTACK and (ply:IsAdmin() or ply.hasbrick) then
+	if key==IN_ATTACK and !IsValid(ply.controller) and (ply:IsAdmin() or ply.hasbrick) then
 		ply.hasbrick=nil
 		local block = ents.Create("prop_physics")
 		block:SetModel("models/props_junk/cinderblock01a.mdl")

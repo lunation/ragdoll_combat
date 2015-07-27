@@ -101,7 +101,7 @@ RAGCOM_CHARS = {
 		]],
 		setup=function(ragdoll)
 			ragdoll:SetMaterial("models/debug/debugwhite")
-			ragdoll:SetColor(Color(255,255,100))
+			ragdoll:SetColor(Color(255,100,100))
 		end,
 		neg="npc/zombie/zombie_die1.wav",
 		pos="npc/fast_zombie/fz_scream1.wav"
@@ -133,7 +133,7 @@ RAGCOM_CHARS = {
 	},
 	--6
 	{
-		model="models/kleiner.mdl",
+		model="models/alyx.mdl",
 		name="Melon Senpai",
 		desc="Fruit Punch!",
 		quote=[[
@@ -150,9 +150,9 @@ RAGCOM_CHARS = {
 				local m = ents.Create("prop_dynamic")
 				m:SetModel("models/props_junk/watermelon01.mdl")
 				m:Spawn()
-				m:SetParent(ragdoll)
-				m:SetParentPhysNum(10)
-				m:SetLocalPos(Vector(0,0,0))
+				local p = ragdoll:GetBonePosition(6)
+				m:SetPos(p+Vector(5,0,-5))-- (0,0,0))
+				m:FollowBone(ragdoll,6)
 				ragdoll:DeleteOnRemove(m)
 			end
 
