@@ -26,7 +26,7 @@ local stride_height = 25
 
 function ENT:Initialize()		
 	if SERVER then
-		self:SetModel("models/props_junk/PlasticCrate01a.mdl")
+		self:SetModel("models/props_c17/computer01_keyboard.mdl")
 
 		local ragdoll = ents.Create("prop_ragdoll")
 		ragdoll:SetModel(RAGCOM_CHARS[self:GetChar()].model)
@@ -64,6 +64,8 @@ function ENT:Initialize()
 
 		self.step_goal = self.step_base*/
 
+		self.type_sound = CreateSound(self,"ambient/machines/keyboard_fast1_1second.wav")
+
 		self.lean = Vector(0,0,0)
 
 		self.steps = {}
@@ -77,6 +79,8 @@ function ENT:Initialize()
 		self.blocking = false
 
 		self.duck = false
+
+		self.next_jump = CurTime()
 
 		self:SetEnergy(self.MaxEnergy)
 		self:SetWeakness(0)
@@ -93,6 +97,8 @@ function ENT:Initialize()
 		self:AddToMotionController(ragdoll:GetPhysicsObject())
 
 		self:SetParent(ragdoll)
+		//self:SetPos(ragdoll:GetBonePosition(1)+Vector(0,0,0))
+		//self:FollowBone(ragdoll,1)
 		self:SetLocalPos(Vector())
 
 		/*self:SetColor(Color(0,0,0,0))
@@ -203,6 +209,12 @@ function ENT:PhysicsSimulate(phys_body,dt)
 					return //failed to stand up... notify user somehow?
 				end
 				self.limp_invuln = false
+				
+				self.ctrl_jump=nil
+				self.ctrl_attack_1=nil
+				self.ctrl_attack_2=nil
+
+				self.next_jump = CurTime()+1
 			/*else
 				self.limp_timer=1
 				print("cant get up")
@@ -213,7 +225,7 @@ function ENT:PhysicsSimulate(phys_body,dt)
 
 	local phys_head = ragdoll:GetPhysicsObjectNum(10)
 
-	if self:GetController():KeyDown(IN_JUMP) then
+	if self.ctrl_jump and CurTime()>self.next_jump then
 		self:EmitSound("player/pl_pain5.wav")
 		self.limp_timer = 2
 		local vel = Vector(0,0,900)+self.lean*self:GetEnergy()*10
@@ -224,10 +236,21 @@ function ENT:PhysicsSimulate(phys_body,dt)
 
 	shadow_data.deltatime = dt
 
+	if self:GetController():IsTyping() != self.type_sound:IsPlaying() then
+		if self:GetController():IsTyping() then
+			self.type_sound:Play()
+		else
+			self.type_sound:Stop()
+		end
+	end
+
 	local phys_fistl = ragdoll:GetPhysicsObjectNum(5)
 	local phys_fistr = ragdoll:GetPhysicsObjectNum(7)
 
-	if self.won then
+	if self:GetController():IsTyping() then
+		doControl(phys_fistl,phys_body:GetPos()+Vector(0,0,10+math.sin(CurTime()*50)*10)+self.yaw:Forward()*15+self.yaw:Right()*-5)
+		doControl(phys_fistr,phys_body:GetPos()+Vector(0,0,10-math.sin(CurTime()*50)*10)+self.yaw:Forward()*15+self.yaw:Right()*5)
+	elseif self.won then
 		doControl(phys_fistl,phys_body:GetPos()+Vector(0,0,40+math.sin(CurTime()*10)*20)+self.yaw:Forward()*10+self.yaw:Right()*-5)
 		doControl(phys_fistr,phys_body:GetPos()+Vector(0,0,40+math.sin(CurTime()*10)*20)+self.yaw:Forward()*10+self.yaw:Right()*5)
 	elseif self.punch_l>0 then
@@ -252,11 +275,10 @@ function ENT:PhysicsSimulate(phys_body,dt)
 			doControl(phys_fistl,phys_body:GetPos()+Vector(0,0,30)+self.yaw:Forward()*10+self.yaw:Right()*-3)
 			doControl(phys_fistr,phys_body:GetPos()+Vector(0,0,30)+self.yaw:Forward()*10+self.yaw:Right()*3)
 		else
-			if self:GetController():KeyDown(IN_ATTACK) then
+			if self.ctrl_attack_1 then
 				self.punch_l=.4
 				self:EmitSound("npc/vort/claw_swing1.wav")
-			end
-			if self:GetController():KeyDown(IN_ATTACK2) then
+			elseif self.ctrl_attack_2 then
 				self.punch_r=.4
 				self:EmitSound("npc/vort/claw_swing2.wav")
 			end
@@ -265,6 +287,10 @@ function ENT:PhysicsSimulate(phys_body,dt)
 			doControl(phys_fistr,phys_body:GetPos()+Vector(0,0,10)+self.yaw:Forward()*10+self.yaw:Right()*5)
 		end
 	end
+
+	self.ctrl_jump=nil
+	self.ctrl_attack_1=nil
+	self.ctrl_attack_2=nil
 	
 
 	
@@ -511,10 +537,15 @@ function ENT:RagdollCollide(ragdoll,data)
 end
 
 function ENT:WinTaunt()
-	self:EmitSound(RAGCOM_CHARS[self:GetChar()].pos)
+	net.Start("ragcom_sound")
+	net.WriteString(RAGCOM_CHARS[self:GetChar()].pos)
+	net.Broadcast()
+
 	self.won=true
 end
 
 function ENT:Draw()
-
+	if self:GetController():IsTyping() then
+		//self:DrawModel()
+	end
 end

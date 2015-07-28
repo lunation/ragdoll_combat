@@ -4,6 +4,7 @@ AddCSLuaFile( "shared.lua" )
 include( 'shared.lua' )
 
 util.AddNetworkString("ragcom_msg")
+util.AddNetworkString("ragcom_sound")
 util.AddNetworkString("ragcom_gui")
 util.AddNetworkString("ragcom_select_char")
 
@@ -75,7 +76,7 @@ end
 
 local function round_end()
 	RAGCOM_ROUND_RUNNING = false
-	timer.Simple(3,function()
+	timer.Simple(5,function()
 		local players = get_non_spectators()
 		for k,v in pairs(players) do
 			v.hasbrick=nil
@@ -102,7 +103,15 @@ function GM:PlayerInitialSpawn(ply)
 end
 
 function GM:KeyPress(ply, key)
-	if key==IN_ATTACK and !IsValid(ply.controller) and (ply:IsAdmin() or ply.hasbrick) then
+	if IsValid(ply.controller) then
+		if key==IN_ATTACK then
+			ply.controller.ctrl_attack_1 = true
+		elseif key==IN_ATTACK2 then
+			ply.controller.ctrl_attack_2 = true
+		elseif key==IN_JUMP then
+			ply.controller.ctrl_jump = true
+		end	
+	elseif key==IN_ATTACK and (ply:IsAdmin() or ply.hasbrick) then
 		ply.hasbrick=nil
 		local block = ents.Create("prop_physics")
 		block:SetModel("models/props_junk/cinderblock01a.mdl")

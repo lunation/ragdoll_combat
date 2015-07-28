@@ -8,6 +8,11 @@ net.Receive("ragcom_msg",function()
 	chat.AddText(color,str)
 end)
 
+net.Receive("ragcom_sound",function()
+	local str = net.ReadString()
+	surface.PlaySound(str)
+end)
+
 local window_help = vgui.Create("DFrame")
 window_help:SetPos(50,50)
 window_help:SetSize(ScrW()-100,ScrH()-100)
@@ -73,7 +78,7 @@ It is open source! Contributions can be made via the <a steamui href="https://gi
 <li>Special thanks to: Postal, Shia LaBeouf, Ellen Pao, whoever is repsonsible for "That Cat", Pugs, John Lua
 <li>Extra special thanks to: Exploderguy, The Commander, James xX, sarge, TheMrFailz, NiandraLades, Fortune11709, Shotz, YourStalker, sarge997, Pdan4, Skylight
 </ul>
-Sorry if I forgot anything please don't ban me from the internet.
+Sorry if I forgot anyone, please don't ban me from the internet.
 <script>
 Array.prototype.forEach.call(document.querySelectorAll("a[steamui]"),function(e) {e.onclick = function() {console.log("RUNLUA:gui.OpenURL('"+e.href+"')");return false;}});
 </script>
@@ -183,7 +188,7 @@ function GM:CalcView(ply,pos,ang,fov,near,far)
 		local headpos = ragdoll:GetBonePosition(6)
 
 		local view = {}
-		view.angles = ply:EyeAngles() // Stupid bullshit doesn't work and I have no time to figure out why.
+		view.angles = ply:EyeAngles() -- Stupid bullshit doesn't work and I have no time to figure out why.
 
 		local tr = util.TraceLine{start=headpos,endpos=headpos+view.angles:Forward()*-120,filter=ragdoll}
 
